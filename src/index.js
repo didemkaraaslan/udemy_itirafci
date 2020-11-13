@@ -1,28 +1,28 @@
-import React, { useEffect } from 'react';
-import ReactDOM from 'react-dom';
-import firebase from './firebase';
-import App from './App';
-import store from './app/store';
-import { Provider } from 'react-redux';
-import { ReactReduxFirebaseProvider } from 'react-redux-firebase';
+import React, { useEffect } from "react";
+import ReactDOM from "react-dom";
+import firebase from "./firebase";
+import App from "./App";
+import store from "./app/store";
+import { Provider } from "react-redux";
+import { ReactReduxFirebaseProvider } from "react-redux-firebase";
 import {
   BrowserRouter as Router,
   Switch,
   Route,
   withRouter,
-} from 'react-router-dom';
-import { useDispatch, useSelector } from 'react-redux';
-import Login from './features/auth/Login';
-import SignUp from './features/auth/SignUp';
-import NoMatch from './components/NoMatch';
-import PrivateRoute from './components/PrivateRoute';
-import 'semantic-ui-css/semantic.min.css';
-import { setCurrentUser } from './features/auth/authSlice';
+} from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import Login from "./features/auth/Login";
+import SignUp from "./features/auth/SignUp";
+import NoMatch from "./components/NoMatch";
+import PrivateRoute from "./components/PrivateRoute";
+import "semantic-ui-css/semantic.min.css";
+import { setCurrentUser } from "./features/auth/authSlice";
 
 const rrfProps = {
   firebase,
   config: {
-    userProfile: 'users',
+    userProfile: "users",
     enableLogging: false,
   },
   dispatch: store.dispatch,
@@ -37,10 +37,10 @@ const Root = ({ history }) => {
       if (user) {
         dispatch(setCurrentUser(user));
       } else {
-        history.push('/login');
+        history.push("/login");
       }
     });
-  });
+  }, []);
 
   return (
     <Switch>
@@ -64,5 +64,5 @@ ReactDOM.render(
       </ReactReduxFirebaseProvider>
     </Provider>
   </React.StrictMode>,
-  document.getElementById('root')
+  document.getElementById("root")
 );
