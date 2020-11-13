@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import {
   Grid,
   Segment,
@@ -8,18 +9,42 @@ import {
   Icon,
   Message,
 } from 'semantic-ui-react';
-import { Link } from 'react-router-dom';
+import { Link, withRouter } from 'react-router-dom';
+import { loginUser } from './authSlice';
+import { unwrapResult } from '@reduxjs/toolkit';
 import styles from './auth.module.css';
 
-const Login = () => {
+const Login = ({ history }) => {
+  const dispatch = useDispatch();
+  const { loading, currentUser } = useSelector((state) => state.auth);
+
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [errors, setErrors] = useState([]);
 
+  useEffect(() => {
+    if (currentUser) {
+      history.push('/');
+    }
+  }, [currentUser]);
+
   const handleSubmit = (event) => {
     event.preventDefault();
-    console.log({ email, password });
+    setErrors([]);
+
+    if (isFormValid()) {
+      dispatch(loginUser({ email, password }))
+        .then(unwrapResult)
+        .then((loggedInUser) => {
+          console.log(loggedInUser);
+        })
+        .catch((error) => {
+          setErrors((prevErrors) => [...prevErrors, error]);
+        });
+    }
   };
+
+  const isFormValid = () => Boolean(email) && Boolean(password);
 
   const displayErrors = () =>
     errors.map((error, key) => <p key={key}> {error.message}</p>);
@@ -58,8 +83,14 @@ const Login = () => {
             </Form.Field>
           </Segment>
 
-          <Button color="green" fluid size="large" onClick={handleSubmit}>
-            Griş Yap
+          <Button
+            color="green"
+            fluid
+            size="large"
+            onClick={handleSubmit}
+            loading={loading === 'pending'}
+          >
+            Giriş Yap
           </Button>
         </Form>
         {errors.length > 0 && <Message error>{displayErrors()}</Message>}
@@ -72,4 +103,4 @@ const Login = () => {
   );
 };
 
-export default Login;
+export default withRouter(Login);

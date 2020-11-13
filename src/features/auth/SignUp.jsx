@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import {
   Grid,
   Segment,
@@ -8,10 +9,15 @@ import {
   Icon,
   Message,
 } from 'semantic-ui-react';
-import { Link } from 'react-router-dom';
+import { Link, withRouter } from 'react-router-dom';
+import { registerUserAndUpdateProfile } from './authSlice';
+import { unwrapResult } from '@reduxjs/toolkit';
 import styles from './auth.module.css';
 
-const SignUp = () => {
+const SignUp = ({ history }) => {
+  const dispatch = useDispatch();
+  const { loading, currentUser } = useSelector((state) => state.auth);
+
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [gender, setGender] = useState('male');
@@ -19,10 +25,56 @@ const SignUp = () => {
   const [passwordConfirm, setPasswordConfirm] = useState('');
   const [errors, setErrors] = useState([]);
 
+  useEffect(() => {
+    if (currentUser) {
+      history.push('/');
+    }
+  }, [currentUser]);
+
   const handleSubmit = (event) => {
     event.preventDefault();
-    console.log({ username, email, password, passwordConfirm, gender });
+
+    setErrors([]);
+
+    if (isFormValid()) {
+      dispatch(
+        registerUserAndUpdateProfile({ username, email, password, gender })
+      )
+        .then(unwrapResult)
+        .then((user) => {})
+        .catch((error) => {
+          setErrors((prevErrors) => [...prevErrors, error]);
+        });
+    }
   };
+
+  const isFormEmpty = () =>
+    ![username, email, password, passwordConfirm, gender].every(Boolean);
+
+  const isFormValid = () => {
+    let error;
+
+    if (!isFormEmpty() && !passwordsNotMatch()) {
+      return true;
+    }
+
+    if (isFormEmpty()) {
+      error = {
+        code: 'empty_fields',
+        message: 'Form boş bırakılamaz',
+      };
+    } else if (passwordsNotMatch()) {
+      error = {
+        code: 'passwords_not_match',
+        message: 'Parola Parola (Tekrar) ile aynı olmalıdır',
+      };
+    }
+
+    setErrors((prevErrors) => [...prevErrors, error]);
+    return false;
+  };
+
+  const passwordsNotMatch = () => password !== passwordConfirm;
 
   const displayErrors = () =>
     errors.map((error, key) => <p key={key}> {error.message}</p>);
@@ -103,7 +155,13 @@ const SignUp = () => {
             </Form.Group>
           </Segment>
 
-          <Button color="green" fluid size="large" onClick={handleSubmit}>
+          <Button
+            color="green"
+            fluid
+            size="large"
+            loading={loading === 'pending'}
+            onClick={handleSubmit}
+          >
             Kaydol
           </Button>
         </Form>
@@ -118,4 +176,4 @@ const SignUp = () => {
   );
 };
 
-export default SignUp;
+export default withRouter(SignUp);
