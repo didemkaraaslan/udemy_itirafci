@@ -1,6 +1,7 @@
 const Joi = require("@hapi/joi");
 
 const confessionSchema = Joi.object().keys({
+  id: Joi.string(),
   content: Joi.string()
     .min(20)
     .max(1000)
@@ -34,7 +35,7 @@ const confessionSchema = Joi.object().keys({
   timestamp: Joi.object().required(),
   user: {
     uid: Joi.string().required(),
-    username: Joi.string.required(),
+    username: Joi.string().required(),
     photoURL: Joi.string().required(),
     gender: Joi.string().required(),
   },
