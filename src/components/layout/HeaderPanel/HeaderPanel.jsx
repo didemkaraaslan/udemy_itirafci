@@ -2,11 +2,22 @@ import React, { useState } from "react";
 import { Menu, Icon, Input, Image, Header, Dropdown } from "semantic-ui-react";
 import { useDispatch, useSelector } from "react-redux";
 import { logoutUser } from "../../../features/auth/authSlice";
+import AddConfessionForm from "../../../features/confession/AddConfessionForm";
 import logo from "../../../images/logo.png";
 
 const HeaderPanel = () => {
   const dispatch = useDispatch();
   const { currentUser } = useSelector((state) => state.auth);
+
+  const [open, setOpen] = useState(false);
+
+  const handleOpen = () => {
+    setOpen(true);
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+  };
 
   const handleSignOut = () => {
     dispatch(logoutUser());
@@ -41,7 +52,7 @@ const HeaderPanel = () => {
         </Menu.Item>
 
         <Menu.Menu position="right">
-          <Menu.Item name="make_confession">
+          <Menu.Item name="make_confession" onClick={handleOpen}>
             <Icon name="pencil" size="big" /> İtiraf et
           </Menu.Item>
 
@@ -61,6 +72,8 @@ const HeaderPanel = () => {
           </Menu.Item>
         </Menu.Menu>
       </Menu>
+
+      <AddConfessionForm open={open} handleClose={handleClose} />
     </React.Fragment>
   );
 };
