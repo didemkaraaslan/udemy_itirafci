@@ -5,7 +5,7 @@ import { logoutUser } from "../../../features/auth/authSlice";
 import AddConfessionForm from "../../../features/confession/AddConfessionForm";
 import logo from "../../../images/logo.png";
 
-const HeaderPanel = () => {
+const HeaderPanel = ({ onSearchTermChange }) => {
   const dispatch = useDispatch();
   const { currentUser } = useSelector((state) => state.auth);
 
@@ -48,6 +48,7 @@ const HeaderPanel = () => {
             placeholder="İtirafları ara.."
             size="large"
             style={{ width: 600 }}
+            onChange={onSearchTermChange}
           />
         </Menu.Item>
 

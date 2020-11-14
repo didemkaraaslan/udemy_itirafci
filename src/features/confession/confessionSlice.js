@@ -61,6 +61,7 @@ export const createConfession = createAsyncThunk(
       .child(key)
       .once("value")
       .then((snapShot) => {
+        console.log(snapShot);
         return snapShot.val();
       });
 
@@ -82,7 +83,9 @@ export const confessionSlice = createSlice({
   },
   extraReducers: {
     [createConfession.fulfilled]: (state, action) => {
-      state.confessions.concat(action.payload);
+      console.log("hello");
+      console.log(action.payload);
+      state.confessions.push(action.payload);
     },
     [fetchConfessions.pending]: (state, action) => {
       state.loading = "pending";
