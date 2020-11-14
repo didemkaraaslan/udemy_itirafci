@@ -69,6 +69,39 @@ export const createConfession = createAsyncThunk(
   }
 );
 
+export const likeConfession = createAsyncThunk(
+  "confessions/likeConfessionStatus",
+  async (confession, { getState, rejectWithValue }) => {
+    const { currentUser } = getState().auth;
+    const currentUserUid = currentUser.uid;
+
+    let userReaction = confession.feelings[currentUserUid];
+    userReaction = userReaction === null ? 0 : userReaction;
+    const userAlreadyLiked = userReaction === 1;
+
+    if (!userAlreadyLiked) {
+      console.log("HELLo");
+      const result = await getFirebase()
+        .database()
+        .ref(`confessions/${confession.id}`)
+        .transaction(function (update) {
+          update.feelings[currentUserUid] = 1;
+          update.numberOfLikes = update.numberOfLikes + 1;
+          update.numberOfDislikes =
+            userReaction === 0
+              ? update.numberOfDislikes
+              : update.numberOfDislikes - 1;
+
+          return update;
+        });
+
+      return { confessionId: confession.id, currentUserUid, userReaction };
+    } else {
+      rejectWithValue("Already Liked");
+    }
+  }
+);
+
 export const confessionSlice = createSlice({
   name: "confessions",
   initialState: {
@@ -96,6 +129,23 @@ export const confessionSlice = createSlice({
     },
     [fetchConfessions.rejected]: (state, action) => {
       state.loading = "idle";
+    },
+    [likeConfession.fulfilled]: (state, action) => {
+      const { confessionId, currentUserUid, userReaction } = action.payload;
+
+      const confession = state.confessions.find(
+        (confession) => confession.id === confessionId
+      );
+
+      confession.feelings[currentUserUid] = 1;
+      confession.numberOfLikes = confession.numberOfLikes + 1;
+      confession.numberOfDislikes =
+        userReaction === 0
+          ? confession.numberOfDislikes
+          : confession.numberOfDislikes - 1;
+    },
+    [likeConfession.rejected]: (state, action) => {
+      console.log(action.payload);
     },
   },
 });

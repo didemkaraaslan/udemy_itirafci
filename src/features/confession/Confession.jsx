@@ -2,7 +2,7 @@ import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import moment from "moment";
 import { Comment, Divider, Segment, Label, Icon } from "semantic-ui-react";
-import { setCurrentCategory } from "./confessionSlice";
+import { setCurrentCategory, likeConfession } from "./confessionSlice";
 import { pickTagColor } from "../../utils/functions";
 import maleAvatar from "../../images/male_avatar.png";
 import femaleAvatar from "../../images/female_avatar.png";
@@ -25,6 +25,10 @@ const Confession = ({ confession }) => {
   };
 
   const timeFromNow = (timestamp) => moment(timestamp).fromNow();
+
+  const handleLike = (confession) => {
+    dispatch(likeConfession(confession));
+  };
 
   return (
     <Segment loading={!confession} style={{ width: 740 }}>
@@ -69,7 +73,7 @@ const Confession = ({ confession }) => {
             <Divider />
 
             <Comment.Actions>
-              <Comment.Action>
+              <Comment.Action onClick={() => handleLike(confession)}>
                 <Icon
                   name={
                     confession.feelings[currentUser.uid] === 1
