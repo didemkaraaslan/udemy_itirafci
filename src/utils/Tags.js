@@ -15,6 +15,7 @@ const HAPPY = "Happy";
 const CONGRATULATIONS = "Congratulations";
 const CHEATING = "Cheating";
 const MOCKING = "Mocking";
+const DEPRESSION = "Depression";
 const SEXUAL_ABUSE = "Sexual Abuse";
 
 const tagOptions = [
@@ -68,6 +69,11 @@ const tagOptions = [
     text: SEXUAL_ABUSE,
     value: SEXUAL_ABUSE,
   },
+  {
+    key: "11",
+    text: DEPRESSION,
+    value: DEPRESSION,
+  },
 ];
 export {
   NOT_ANONYMOUS,
@@ -84,6 +90,7 @@ export {
   CONGRATULATIONS,
   CHEATING,
   MOCKING,
+  DEPRESSION,
   SEXUAL_ABUSE,
   tagOptions,
 };

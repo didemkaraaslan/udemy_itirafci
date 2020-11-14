@@ -107,6 +107,13 @@ const SidePanel = () => {
             active={currentCategory === Tag.CONGRATULATIONS}
             onClick={(event) => handleMenuItemClick(Tag.CONGRATULATIONS, event)}
           />
+          <Menu.Item
+            name={Tag.DEPRESSION}
+            as="a"
+            icon="hashtag"
+            active={currentCategory === Tag.DEPRESSION}
+            onClick={(event) => handleMenuItemClick(Tag.DEPRESSION, event)}
+          />
         </Menu.Menu>
       </Menu.Item>
       {/* Özel Kategoriler */}

@@ -15,9 +15,9 @@ export const fetchConfessions = createAsyncThunk(
         snapShot.forEach((snap) => {
           confessions.push(snap.val());
         });
-      });
 
-    return confessions;
+        return confessions;
+      });
 
     return data;
   }
@@ -89,7 +89,7 @@ export const confessionSlice = createSlice({
     },
     [fetchConfessions.fulfilled]: (state, action) => {
       state.loading = "idle";
-      state.confessions = actin.payload;
+      state.confessions = action.payload;
     },
     [fetchConfessions.rejected]: (state, action) => {
       state.loading = "idle";
