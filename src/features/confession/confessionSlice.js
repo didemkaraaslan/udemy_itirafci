@@ -3,6 +3,26 @@ import { getFirebase } from "react-redux-firebase";
 import { ALL } from "../../utils/Tags";
 import { confessionSchema } from "../../utils/schema";
 
+export const fetchConfessions = createAsyncThunk(
+  "confessions/fetchConfessionsStatus",
+  async (_, {}) => {
+    const data = await getFirebase()
+      .database()
+      .ref("confessions")
+      .once("value")
+      .then((snapShot) => {
+        let confessions = [];
+        snapShot.forEach((snap) => {
+          confessions.push(snap.val());
+        });
+      });
+
+    return confessions;
+
+    return data;
+  }
+);
+
 export const createConfession = createAsyncThunk(
   "confessions/createConfessionStatus",
   async ({ content, tags, shareAs, profile }, { getState }) => {
@@ -35,7 +55,7 @@ export const createConfession = createAsyncThunk(
 
     const validate = await confessionSchema.validateAsync(confession);
 
-    const result = confessionsRef.child(key).set(confession);
+    const result = await confessionsRef.child(key).set(confession);
 
     const savedConfession = await confessionsRef
       .child(key)
@@ -63,6 +83,16 @@ export const confessionSlice = createSlice({
   extraReducers: {
     [createConfession.fulfilled]: (state, action) => {
       state.confessions.concat(action.payload);
+    },
+    [fetchConfessions.pending]: (state, action) => {
+      state.loading = "pending";
+    },
+    [fetchConfessions.fulfilled]: (state, action) => {
+      state.loading = "idle";
+      state.confessions = actin.payload;
+    },
+    [fetchConfessions.rejected]: (state, action) => {
+      state.loading = "idle";
     },
   },
 });
