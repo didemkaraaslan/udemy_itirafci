@@ -2,7 +2,11 @@ import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import moment from "moment";
 import { Comment, Divider, Segment, Label, Icon } from "semantic-ui-react";
-import { setCurrentCategory, likeConfession } from "./confessionSlice";
+import {
+  setCurrentCategory,
+  likeConfession,
+  dislikeConfession,
+} from "./confessionSlice";
 import { pickTagColor } from "../../utils/functions";
 import maleAvatar from "../../images/male_avatar.png";
 import femaleAvatar from "../../images/female_avatar.png";
@@ -28,6 +32,10 @@ const Confession = ({ confession }) => {
 
   const handleLike = (confession) => {
     dispatch(likeConfession(confession));
+  };
+
+  const handleDislike = (confession) => {
+    dispatch(dislikeConfession(confession));
   };
 
   return (
@@ -73,7 +81,7 @@ const Confession = ({ confession }) => {
             <Divider />
 
             <Comment.Actions>
-              <Comment.Action onClick={() => handleLike(confession)}>
+              <Comment.Action onClick={(e) => handleLike(confession)}>
                 <Icon
                   name={
                     confession.feelings[currentUser.uid] === 1
@@ -83,7 +91,7 @@ const Confession = ({ confession }) => {
                 />
                 {confession.numberOfLikes}
               </Comment.Action>
-              <Comment.Action>
+              <Comment.Action onClick={(e) => handleDislike(confession)}>
                 <Icon
                   name={
                     confession.feelings[currentUser.uid] === -1
