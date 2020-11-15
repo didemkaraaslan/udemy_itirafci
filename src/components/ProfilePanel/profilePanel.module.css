@@ -1,0 +1,38 @@
+.backBtn {
+  background-color: transparent;
+  background-repeat: no-repeat;
+  border: none;
+  cursor: pointer;
+  overflow: hidden;
+  outline: none;
+}
+
+.profile__top__area {
+  margin-bottom: 20px;
+}
+
+.profile__avatar {
+  position: absolute;
+  top: 5px;
+  left: 40px;
+  width: 130px;
+  height: 130px;
+}
+
+.profile__user__name {
+  position: absolute;
+  top: 45px;
+  left: 200px;
+  font-size: 17px;
+  font-weight: 600;
+}
+
+.profile__user__biography {
+  position: absolute;
+  top: 85px;
+  left: 200px;
+  color: #cccccc;
+  font-style: italic;
+  font-size: 14px;
+  font-weight: 400;
+}

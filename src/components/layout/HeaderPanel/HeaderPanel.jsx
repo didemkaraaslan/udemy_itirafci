@@ -5,7 +5,7 @@ import { logoutUser } from "../../../features/auth/authSlice";
 import AddConfessionForm from "../../../features/confession/AddConfessionForm";
 import logo from "../../../images/logo.png";
 
-const HeaderPanel = ({ onSearchTermChange }) => {
+const HeaderPanel = ({ onSearchTermChange, openProfilePanel }) => {
   const dispatch = useDispatch();
   const { currentUser } = useSelector((state) => state.auth);
 
@@ -60,7 +60,12 @@ const HeaderPanel = ({ onSearchTermChange }) => {
           <Menu.Item name="user">
             <Dropdown trigger={trigger} pointing="top right" icon={null}>
               <Dropdown.Menu>
-                <Dropdown.Item key="user" icon="user" text="Profil" />
+                <Dropdown.Item
+                  key="user"
+                  icon="user"
+                  text="Profil"
+                  onClick={openProfilePanel}
+                />
                 <Dropdown.Item key="settings" icon="settings" text="Ayarlar" />
                 <Dropdown.Item
                   key="signout"
