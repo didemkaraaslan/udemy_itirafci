@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchConfessions } from "./confessionSlice";
 import Confession from "./Confession";
+import ConfessionSkeleton from "./ConfessionSkeleton";
 import {
   ALL,
   NOT_ANONYMOUS,
@@ -9,6 +10,7 @@ import {
   MOST_APPROVED,
   MOST_JUDGED,
 } from "../../utils/Tags";
+
 const ConfessionsList = ({ searchTerm }) => {
   const dispatch = useDispatch();
   const { currentUser } = useSelector((state) => state.auth);
@@ -21,8 +23,6 @@ const ConfessionsList = ({ searchTerm }) => {
       dispatch(fetchConfessions());
     }
   }, [dispatch]);
-
-  console.log(searchTerm);
 
   const applySpecialFilter = (confessions) => {
     switch (currentCategory) {
@@ -83,6 +83,13 @@ const ConfessionsList = ({ searchTerm }) => {
 
     return ordered;
   };
+
+  const displaySkeleton = () =>
+    [...Array(10)].map((_, i) => <ConfessionSkeleton key={i} />);
+
+  if (loading === "pending") {
+    return displaySkeleton();
+  }
 
   return (
     <div>

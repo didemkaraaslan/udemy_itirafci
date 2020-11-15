@@ -21,7 +21,7 @@ const App = () => {
             <SidePanel />
           </Grid.Column>
           <Grid.Column width={10}>
-            <div style={{ position: "absolute", top: 80, left: 25 }}>
+            <div style={{ position: "absolute", top: 90, left: 25 }}>
               <ConfessionsList searchTerm={searchTerm} />
             </div>
           </Grid.Column>
