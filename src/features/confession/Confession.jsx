@@ -6,6 +6,7 @@ import {
   setCurrentCategory,
   likeConfession,
   dislikeConfession,
+  addFavorite,
 } from "./confessionSlice";
 import { pickTagColor } from "../../utils/functions";
 import maleAvatar from "../../images/male_avatar.png";
@@ -38,6 +39,10 @@ const Confession = ({ confession }) => {
     dispatch(dislikeConfession(confession));
   };
 
+  const favoriteConfession = (confession) => {
+    dispatch(addFavorite(confession));
+  };
+
   return (
     <Segment loading={!confession} style={{ width: 740 }}>
       <Comment.Group className={styles.comment}>
@@ -60,6 +65,7 @@ const Confession = ({ confession }) => {
                     : "heart outline"
                 }
                 size="large"
+                onClick={(e) => favoriteConfession(confession)}
               />
             </span>
             <Comment.Text>{confession.content}</Comment.Text>

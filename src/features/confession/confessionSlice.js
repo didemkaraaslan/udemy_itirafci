@@ -136,6 +136,27 @@ export const dislikeConfession = createAsyncThunk(
   }
 );
 
+export const addFavorite = createAsyncThunk(
+  "confessions/addFavoritesStatus",
+  async (confession, { getState }) => {
+    const { currentUser } = getState().auth;
+    const currentUserUid = currentUser.uid;
+
+    let userReaction = confession.favorites[currentUserUid];
+    userReaction = userReaction === null ? 0 : userReaction;
+
+    const result = await getFirebase().update(`confessions/${confession.id}`, {
+      ...confession,
+      favorites: {
+        ...confession.favorites,
+        [currentUserUid]: userReaction === 0 ? 1 : 0,
+      },
+    });
+
+    return { confessionId: confession.id, currentUserUid, userReaction };
+  }
+);
+
 export const confessionSlice = createSlice({
   name: "confessions",
   initialState: {
@@ -163,6 +184,18 @@ export const confessionSlice = createSlice({
     },
     [fetchConfessions.rejected]: (state, action) => {
       state.loading = "idle";
+    },
+    [addFavorite.fulfilled]: (state, action) => {
+      const { confessionId, currentUserUid, userReaction } = action.payload;
+
+      const confession = state.confessions.find(
+        (confession) => confession.id === confessionId
+      );
+
+      confession.favorites = {
+        ...confession.favorites,
+        [currentUserUid]: userReaction === 0 ? 1 : 0,
+      };
     },
     [likeConfession.fulfilled]: (state, action) => {
       const { confessionId, currentUserUid, userReaction } = action.payload;
