@@ -3,9 +3,17 @@ import { Menu, Icon, Input, Image, Header, Dropdown } from "semantic-ui-react";
 import { useDispatch, useSelector } from "react-redux";
 import { logoutUser } from "../../../features/auth/authSlice";
 import AddConfessionForm from "../../../features/confession/AddConfessionForm";
+import Toggle from "./Toggle";
+import { lightTheme, darkTheme } from "../../../utils/theme";
 import logo from "../../../images/logo.png";
+import logoDark from "../../../images/logo-dark.png";
 
-const HeaderPanel = ({ onSearchTermChange, openProfilePanel }) => {
+const HeaderPanel = ({
+  theme,
+  toggleTheme,
+  onSearchTermChange,
+  openProfilePanel,
+}) => {
   const dispatch = useDispatch();
   const { currentUser } = useSelector((state) => state.auth);
 
@@ -29,13 +37,25 @@ const HeaderPanel = ({ onSearchTermChange, openProfilePanel }) => {
     </span>
   );
 
+  const themeMode = theme === "light" ? lightTheme : darkTheme;
+
   return (
     <React.Fragment>
-      <Menu fluid secondary pointing fixed="top">
+      <Menu
+        fluid
+        secondary
+        pointing
+        fixed="top"
+        style={{
+          background: theme === "light" ? "#fff" : "",
+        }}
+        color={themeMode.headerPanelBackground}
+        inverted={themeMode.headerPanelInverted}
+      >
         <Menu.Item as="a" header color="pink">
           <Image
             size="mini"
-            src={logo}
+            src={theme === "light" ? logo : logoDark}
             alt="app_logo"
             style={{ marginRight: "1.5em" }}
           />
@@ -55,6 +75,10 @@ const HeaderPanel = ({ onSearchTermChange, openProfilePanel }) => {
         <Menu.Menu position="right">
           <Menu.Item name="make_confession" onClick={handleOpen}>
             <Icon name="pencil" size="big" /> İtiraf et
+          </Menu.Item>
+
+          <Menu.Item name="toggle_theme">
+            <Toggle theme={theme} toggleTheme={toggleTheme} />
           </Menu.Item>
 
           <Menu.Item name="user">

@@ -3,8 +3,8 @@ import { useDispatch, useSelector } from "react-redux";
 import { Menu } from "semantic-ui-react";
 import { setCurrentCategory } from "../../../features/confession/confessionSlice";
 import * as Tag from "../../../utils/Tags";
-
-const SidePanel = () => {
+import { lightTheme, darkTheme } from "../../../utils/theme";
+const SidePanel = ({ theme }) => {
   const dispatch = useDispatch();
   const { currentCategory } = useSelector((state) => state.confessions);
 
@@ -13,11 +13,14 @@ const SidePanel = () => {
     dispatch(setCurrentCategory(name));
   };
 
+  const themeMode = theme === "light" ? lightTheme : darkTheme;
   return (
     <Menu
       vertical
       fixed="left"
       pointing
+      color={themeMode.sidePanelBackground}
+      inverted={themeMode.sidePanelInverted}
       style={{
         marginTop: 61,
         width: 380,
