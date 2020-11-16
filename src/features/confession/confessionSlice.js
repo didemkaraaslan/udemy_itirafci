@@ -76,10 +76,7 @@ export const likeConfession = createAsyncThunk(
     const currentUserUid = currentUser.uid;
 
     let userReaction = confession.feelings[currentUserUid];
-    userReaction = userReaction === null ? 0 : userReaction;
-    const userAlreadyLiked = userReaction === 1;
-
-    if (!userAlreadyLiked) {
+    if (!userReaction) {
       const result = await getFirebase()
         .database()
         .ref(`confessions/${confession.id}`)
@@ -87,18 +84,34 @@ export const likeConfession = createAsyncThunk(
           if (update) {
             update.feelings[currentUserUid] = 1;
             update.numberOfLikes = update.numberOfLikes + 1;
-            update.numberOfDislikes =
-              userReaction === 0
-                ? update.numberOfDislikes
-                : update.numberOfDislikes - 1;
           }
 
           return update;
         });
-
       return { confessionId: confession.id, currentUserUid, userReaction };
     } else {
-      return rejectWithValue("Already Liked");
+      const userAlreadyLiked = userReaction === 1;
+
+      if (!userAlreadyLiked) {
+        const result = await getFirebase()
+          .database()
+          .ref(`confessions/${confession.id}`)
+          .transaction(function (update) {
+            if (update) {
+              update.feelings[currentUserUid] = 1;
+              update.numberOfLikes = update.numberOfLikes + 1;
+              update.numberOfDislikes =
+                userReaction === 0
+                  ? update.numberOfDislikes
+                  : update.numberOfDislikes - 1;
+            }
+
+            return update;
+          });
+        return { confessionId: confession.id, currentUserUid, userReaction };
+      } else {
+        return rejectWithValue("Already Liked");
+      }
     }
   }
 );
@@ -110,10 +123,8 @@ export const dislikeConfession = createAsyncThunk(
     const currentUserUid = currentUser.uid;
 
     let userReaction = confession.feelings[currentUserUid];
-    userReaction = userReaction === null ? 0 : userReaction;
-    const userAlreadyDisliked = userReaction === -1;
 
-    if (!userAlreadyDisliked) {
+    if (!userReaction) {
       const result = await getFirebase()
         .database()
         .ref(`confessions/${confession.id}`)
@@ -121,17 +132,34 @@ export const dislikeConfession = createAsyncThunk(
           if (update) {
             update.feelings[currentUserUid] = -1;
             update.numberOfDislikes = update.numberOfDislikes + 1;
-            update.numberOfLikes =
-              userReaction === 0
-                ? update.numberOfLikes
-                : update.numberOfLikes - 1;
           }
+
           return update;
         });
       return { confessionId: confession.id, currentUserUid, userReaction };
     } else {
-      console.log("Rejected");
-      return rejectWithValue("Already Disliked");
+      const userAlreadyDisliked = userReaction === -1;
+
+      if (!userAlreadyDisliked) {
+        const result = await getFirebase()
+          .database()
+          .ref(`confessions/${confession.id}`)
+          .transaction(function (update) {
+            if (update) {
+              update.feelings[currentUserUid] = -1;
+              update.numberOfDislikes = update.numberOfDislikes + 1;
+              update.numberOfLikes =
+                userReaction === 0
+                  ? update.numberOfLikes
+                  : update.numberOfLikes - 1;
+            }
+
+            return update;
+          });
+        return { confessionId: confession.id, currentUserUid, userReaction };
+      } else {
+        return rejectWithValue("Already Disliked");
+      }
     }
   }
 );
@@ -143,15 +171,29 @@ export const addFavorite = createAsyncThunk(
     const currentUserUid = currentUser.uid;
 
     let userReaction = confession.favorites[currentUserUid];
-    userReaction = userReaction === null ? 0 : userReaction;
-
-    const result = await getFirebase().update(`confessions/${confession.id}`, {
-      ...confession,
-      favorites: {
-        ...confession.favorites,
-        [currentUserUid]: userReaction === 0 ? 1 : 0,
-      },
-    });
+    if (!userReaction) {
+      const result = await getFirebase().update(
+        `confessions/${confession.id}`,
+        {
+          ...confession,
+          favorites: {
+            ...confession.favorites,
+            [currentUserUid]: 1,
+          },
+        }
+      );
+    } else {
+      const result = await getFirebase().update(
+        `confessions/${confession.id}`,
+        {
+          ...confession,
+          favorites: {
+            ...confession.favorites,
+            [currentUserUid]: userReaction === 0 ? 1 : 0,
+          },
+        }
+      );
+    }
 
     return { confessionId: confession.id, currentUserUid, userReaction };
   }
@@ -192,10 +234,17 @@ export const confessionSlice = createSlice({
         (confession) => confession.id === confessionId
       );
 
-      confession.favorites = {
-        ...confession.favorites,
-        [currentUserUid]: userReaction === 0 ? 1 : 0,
-      };
+      if (!userReaction) {
+        confession.favorites = {
+          ...confession.favorites,
+          [currentUserUid]: 1,
+        };
+      } else {
+        confession.favorites = {
+          ...confession.favorites,
+          [currentUserUid]: userReaction === 0 ? 1 : 0,
+        };
+      }
     },
     [likeConfession.fulfilled]: (state, action) => {
       const { confessionId, currentUserUid, userReaction } = action.payload;
@@ -204,12 +253,17 @@ export const confessionSlice = createSlice({
         (confession) => confession.id === confessionId
       );
 
-      confession.feelings[currentUserUid] = 1;
-      confession.numberOfLikes = confession.numberOfLikes + 1;
-      confession.numberOfDislikes =
-        userReaction === 0
-          ? confession.numberOfDislikes
-          : confession.numberOfDislikes - 1;
+      if (!userReaction) {
+        confession.feelings[currentUserUid] = 1;
+        confession.numberOfLikes = confession.numberOfLikes + 1;
+      } else {
+        confession.feelings[currentUserUid] = 1;
+        confession.numberOfLikes = confession.numberOfLikes + 1;
+        confession.numberOfDislikes =
+          userReaction === 0
+            ? confession.numberOfDislikes
+            : confession.numberOfDislikes - 1;
+      }
     },
     [dislikeConfession.fulfilled]: (state, action) => {
       const { confessionId, currentUserUid, userReaction } = action.payload;
@@ -218,12 +272,17 @@ export const confessionSlice = createSlice({
         (confession) => confession.id === confessionId
       );
 
-      confession.feelings[currentUserUid] = -1;
-      confession.numberOfDislikes = confession.numberOfDislikes + 1;
-      confession.numberOfLikes =
-        userReaction === 0
-          ? confession.numberOfLikes
-          : confession.numberOfLikes - 1;
+      if (!userReaction) {
+        confession.feelings[currentUserUid] = -1;
+        confession.numberOfDislikes = confession.numberOfDislikes + 1;
+      } else {
+        confession.feelings[currentUserUid] = -1;
+        confession.numberOfDislikes = confession.numberOfDislikes + 1;
+        confession.numberOfLikes =
+          userReaction === 0
+            ? confession.numberOfLikes
+            : confession.numberOfLikes - 1;
+      }
     },
   },
 });
